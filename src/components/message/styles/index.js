@@ -16,9 +16,7 @@ export const ChatMessage = styled("div")({
     position: "relative",
     width: '274px',
     padding: '5px 10px 5px 8px',
-    background: bgColor,
-    marginRight: '20px',
-    marginLeft: '20px'
+    background: bgColor
 });
 
 export const MessageText = styled(Typography)({

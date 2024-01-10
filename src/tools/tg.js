@@ -1,1 +1,1 @@
-export const tg = window.Telegram.WebApp;
+export const tg = window.Telegram.WebApp.themeParams;

@@ -1,12 +1,13 @@
-import { Typography, Box } from "@mui/material";
+import { Box } from "@mui/material";
 import ChatPageCard from "../../components/chatPageCard/ChatPageCard";
-import { Header } from "./styles";
 import {useParams} from "react-router-dom";
 import { useShowPopup } from '@vkruglikov/react-telegram-web-app';
 
-import { tg } from "../../tools/tg";
 import ApiService from "../../services/apiService/ApiService";
 import { useEffect, useState } from "react";
+import Header from "../../components/header/Header";
+
+const {getObjects} = new ApiService();
 
 const ChatsPage = () => {
     const {userId} = useParams();
@@ -16,8 +17,6 @@ const ChatsPage = () => {
 
     const showPopUp = useShowPopup();
 
-    const {getObjects} = new ApiService();
-
     useEffect(() => {
         setStatus('loading');
 
@@ -26,27 +25,22 @@ const ChatsPage = () => {
                 setObjects(data);
                 setStatus('idle');
             })
-            .catch(() => {
+            .catch((e) => {
                 setStatus('error');
                 showPopUp({
-                    message: 'Что-то пошло не так, попробуйте перезапустить приложение',
+                    message: e,
                 })
             });
+        
+        // eslint-disable-next-line
     }, [userId]);
 
     const chats = status === 'idle' && <Chats chats={objects} />;
-    const headerTitle = status === 'idle' ? 'Chats' : 'Loading...';
+    const headerTitle = status === 'loading' ? 'Загрузка...' : 'Чаты';
 
     return (
         <>
-            <Header>
-                <Typography component={'h1'} sx={{
-                    textAlign: 'center',
-                    fontSize: '20px',
-                    fontWeight: '500',
-                    color: tg?.button_text_color ? tg.button_text_color : '#fff'
-                }}>{headerTitle}</Typography>
-            </Header>
+            <Header title={headerTitle} />
             {chats}
         </>
     )

@@ -13,6 +13,7 @@
     "@testing-library/user-event": "^13.5.0",
     "@vkruglikov/react-telegram-web-app": "^2.1.9",
     "axios": "^1.6.3",
+    "body-scroll-lock": "^4.0.0-beta.0",
     "moment": "^2.30.1",
     "pusher-js": "^8.4.0-rc2",
     "react": "^18.2.0",

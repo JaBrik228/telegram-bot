@@ -1,35 +1,46 @@
-import { Box } from "@mui/material";
+import { Box, Container } from "@mui/material";
 import Message from "../../components/message/Message";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import ApiService from "../../services/apiService/ApiService";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import moment from 'moment';
-import { Button, ChatInput } from "./styles";
+import { BackButton, useHapticFeedback, useShowPopup } from "@vkruglikov/react-telegram-web-app";
+import Header from "../../components/header/Header";
+import InputChat from "../../components/inputChat/InputChat";
 
+const {apiPusher, getMessages, sendMessage} = new ApiService();
 
 const SingleChatPage  = () => {
     const {userId, objectId} = useParams();
 
     const [messages, setMessages] = useState([]);
-    const [messageText, setMessageText] = useState('');
+    const [status, setStatus] = useState('idle');
 
-    const {pusher, getMessages, sendMessage} = new ApiService();
+    const showPopup = useShowPopup();
 
-    const chatRef = useRef(null);
+    const navigate = useNavigate();
+
+    const [impactOccurred] = useHapticFeedback();
 
     useEffect(() => {
-        console.log('kk')
+        setStatus('loading');
+
         getMessages(userId, objectId)
             .then(data => {
                 setMessages((prevMessages) => [...prevMessages, ...data]);
+                setStatus('idle');
             })
             .catch(() => {
-                console.log('error');
+                setStatus('error');
+                showPopup({
+                    message: 'Что-то пошло не так, попробуйте перезапустить приложение'
+                });
             });
+        // eslint-disable-next-line
     }, []);
 
     useEffect(() => {
-        const channel = pusher.subscribe(`property-${objectId}`);
+        const channel = apiPusher.subscribe(`property-${objectId}`);
         channel.bind('message', socketMessage => {
             if(socketMessage.from_user_id !== +userId){
                 const currentDate = new Date().toISOString();
@@ -47,14 +58,13 @@ const SingleChatPage  = () => {
         });
 
         return () => {
-            pusher.unsubscribe(`property-${objectId}`);
+            apiPusher.unsubscribe(`property-${objectId}`);
         };
     }, [objectId, userId]);
 
-    const onSendMessage = useCallback(() => {
-        if(!messageText){
-            return;
-        }
+    const onSendMessage = useCallback((messageText) => {
+        impactOccurred('light');
+
         const currentDate = new Date().toISOString();
 
         setMessages(prevMessages => [...prevMessages, {
@@ -74,10 +84,9 @@ const SingleChatPage  = () => {
             "to_user_id": -1
         };
 
-        setMessageText('');
-
         sendMessage(data);
-    }, [messageText]);
+        // eslint-disable-next-line
+    }, []);
 
     useEffect(() => {
         window.scrollTo({
@@ -86,32 +95,31 @@ const SingleChatPage  = () => {
         });
     }, [messages]);
 
-    const items = messages.map(message => {
+    const items = status === 'idle' && messages.map(message => {
         return (
             <Message key={message.id} isRightPos={message.from_user_id !== -1} text={message.text} time={moment(message.created_at).format("MMMM d, HH:mm")} />
         )
     });
 
+    const chatTitle = status === 'loading' ? 'Загрузка...' : 'Чат';
+
     return (
-        <Box ref={chatRef} sx={{
-            paddingBottom: '10vh',
-        }}>
-            {items}
+        <>
+            <Header title={chatTitle} />
+
             <Box sx={{
-                position: 'fixed',
-                bottom: '0',
-                width: '100%',
+                padding: '60px 0 70px 0',
             }}>
-                <ChatInput value={messageText} onChange={(event) => {
-                    setMessageText(event.target.value);
-                }} onKeyDown={(e) => {
-                    if(e.key === 'Enter'){
-                        onSendMessage();
-                    }
-                }} placeholder="Type your message"></ChatInput>
-                <Button onClick={onSendMessage} />
+                <Container maxWidth>
+                    {items}
+                </Container>
+                <InputChat sendMessage={(message) => onSendMessage(message)} />
             </Box>
-        </Box>
+
+            <BackButton onClick={() => {
+                navigate(-1);
+            }} />
+        </>
     );
 };
 

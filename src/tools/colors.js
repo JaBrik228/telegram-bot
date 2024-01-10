@@ -6,4 +6,5 @@ export const colors = {
     buttonColor: tg?.button_color ? tg.button_color : "#517DA2",
     buttonTextColor: tg?.button_text_color ? tg.button_text_color : "#fff",
     bgColor: tg?.bg_color ? tg.bg_color : "#fff",
+    headerBgColor: tg?.header_bg_color ? tg.header_bg_color : '#517DA2'
 };
