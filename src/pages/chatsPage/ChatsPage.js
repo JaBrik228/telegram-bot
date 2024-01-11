@@ -1,7 +1,7 @@
 import { Box } from "@mui/material";
 import ChatPageCard from "../../components/chatPageCard/ChatPageCard";
 import {useParams} from "react-router-dom";
-import { useShowPopup } from '@vkruglikov/react-telegram-web-app';
+import { useShowPopup, useWebApp } from '@vkruglikov/react-telegram-web-app';
 
 import ApiService from "../../services/apiService/ApiService";
 import { useEffect, useState } from "react";
@@ -15,7 +15,8 @@ const ChatsPage = () => {
     const [status, setStatus] = useState('idle');
     const [objects, setObjects] = useState([]);
 
-    const showPopUp = useShowPopup();
+    const showPopup = useShowPopup();
+    const tg = useWebApp();
 
     useEffect(() => {
         setStatus('loading');
@@ -25,11 +26,11 @@ const ChatsPage = () => {
                 setObjects(data);
                 setStatus('idle');
             })
-            .catch((e) => {
+            .catch(() => {
                 setStatus('error');
-                showPopUp({
-                    message: e,
-                })
+                showPopup({
+                    message: 'Что-то пошло не так, попробуйте перезапустить приложение',
+                }).then(() => tg.close());
             });
         
         // eslint-disable-next-line

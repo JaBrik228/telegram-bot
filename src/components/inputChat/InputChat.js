@@ -3,11 +3,10 @@ import { Button, ChatInput } from "./styles";
 import { useState, useRef, useCallback, useEffect } from "react";
 import { isIOS } from "../../tools/utils";
 
-import { enableBodyScroll, disableBodyScroll } from "body-scroll-lock";
+const keyboardSize = '270px';
 
-const viewport = window.visualViewport;
+let pendingUpdate = false;
 
-const MAX_KEYBOARD_PROPORTION = .52;
 
 const InputChat = ({sendMessage}) => {
     const [messageText, setMessageText] = useState('');
@@ -16,31 +15,31 @@ const InputChat = ({sendMessage}) => {
     const inputRef = useRef(null);
 
     useEffect(() => {
-        // if (!isIOS()) {
-        //     return;
-        // }
+        if (!isIOS()) {
+            return;
+        }
+        function viewportHandler() {
+            if (pendingUpdate) return;
+            pendingUpdate = true;
+            window.requestAnimationFrame(() => {
+                pendingUpdate = false;
+                
+                // Stick to bottom 
+                if (window.visualViewport.offsetTop >= 0) {
+                    chatRef.current.style.transform = `translateY(-${Math.max(0, window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop)}px)`;
+                } else {
+                    chatRef.current.style.transform = '';
+                }
+            });
+        }
+        
+        window.visualViewport.addEventListener("scroll", viewportHandler);
+        window.visualViewport.addEventListener("resize", viewportHandler);
 
-        // const closeInput = (e) => {
-        //     if (chatRef.current.contains(e.target)) {
-        //         console.log('clicked outside');
-        //         inputRef.current.focus();
-        //     }
-        // }
-
-        // window.addEventListener("touchstart", closeInput);
-
-        // const height = window.visualViewport.height;
-
-        // function resizeHandler() {
-        //     chatRef.current.style.bottom = `${height - viewport.height}px`;
-        // }
-
-
-        // viewport.addEventListener("resize", resizeHandler);
-        // return () => {
-        //     // viewport.removeEventListener("resize", resizeHandler);
-        //     // window.removeEventListener("touchstart", closeInput);
-        // }
+        return () => {
+            window.visualViewport.removeEventListener("scroll", viewportHandler);
+            window.visualViewport.removeEventListener("resize", viewportHandler);
+        }   
     }, []);
 
     const blurHandler = useCallback(() => {
@@ -48,11 +47,7 @@ const InputChat = ({sendMessage}) => {
             return;
         }
 
-        // document.body.style.paddingBottom = '0px';
-        // chatRef.current.style.position = 'fixed';
-        // chatRef.current.style.marginBottom = '0px';
-        // chatRef.current.classList.remove('input--focused');
-        window.scrollTo(0, document.body.scrollHeight);
+        document.body.style.paddingBottom = '0px';
     }, []);
 
     const onSendMessage = () => {
@@ -64,22 +59,16 @@ const InputChat = ({sendMessage}) => {
     }
 
     const iosKeyboardInputFix = useCallback(() => {
-        // if (!isIOS()) {
-        //     return;
-        // }
-        // document.body.style.paddingBottom = '270px';
-        chatRef.current.style.bottom = 'env(keyboard-inset-bottom, 30px)';
-        setTimeout(() => {
-            chatRef.current.style.bottom = '0px';
-        }, 500);
-
-        // chatRef.current.style.position = 'absolute';
-        // chatRef.current.style.marginBottom = '270px';
+        if (!isIOS()) {
+            return;
+        }
+        document.body.style.paddingBottom = keyboardSize;
+        window.scrollTo(0, document.body.scrollHeight - 1000);
     }, []);
 
     return (
         <Box ref={chatRef} sx={{
-            position: 'absolute',
+            position: 'fixed',
             bottom: '0px',
             width: '100%',
             zIndex: '3',
