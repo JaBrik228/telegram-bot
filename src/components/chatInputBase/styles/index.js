@@ -3,10 +3,13 @@ import { styled } from '@mui/system';
 import { colors } from '../../../tools/colors';
 
 import sendIcon from '../../../assets/icons/send-icon.svg';
+import { Box } from '@mui/material';
 // import { TextField } from '@mui/material';
 
-export const ChatInput = styled('input')({
+export const ChatInput = styled(Box)({
     // display: 'block',
+    // position: 'absolute',
+    // top: '0',
     width: '100%',
     height: '50px',
     padding: '10px 13px',
@@ -16,7 +19,7 @@ export const ChatInput = styled('input')({
     fontSize: '16px !important',
     fontWeight: '400',
     outline: 'none',
-    zIndex: '4',
+    zIndex: '1',
     // marginBottom: '0px !important',
     // '-webkit-appearance': 'none'
 });

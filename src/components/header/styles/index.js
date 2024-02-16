@@ -2,9 +2,10 @@ import { styled } from '@mui/system';
 
 import { colors } from '../../../tools/colors';
 
-export const StyledHeader = styled('div')({
-    position: 'fixed',
+export const StyledHeader = styled('header')({
+    position: 'absolute',
     top: '0',
+    left: '0',
     width: '100%',
     height: '57px',
     background: colors.buttonColor,

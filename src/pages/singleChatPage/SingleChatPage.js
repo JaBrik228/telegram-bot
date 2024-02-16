@@ -1,17 +1,14 @@
-import { Box, Container } from "@mui/material";
-import Message from "../../components/message/Message";
+
 import { useCallback, useEffect, useState } from "react";
 import ApiService from "../../services/apiService/ApiService";
 import { useNavigate, useParams } from "react-router";
-import moment from 'moment';
 import { BackButton, useHapticFeedback, useShowPopup, useWebApp } from "@vkruglikov/react-telegram-web-app";
-import Header from "../../components/header/Header";
-import InputChat from "../../components/inputChat/InputChat";
-import 'moment/locale/ru';
-import { toMessageObj } from "../../tools/utils";
+import { isIOS, toMessageObj } from "../../tools/utils";
+import IphoneKeyboardFix from "../../components/iphoneFixKeyboard/IphoneKeyboardFix";
+import Chat from "../../components/chat/Chat";
+
 
 const {apiPusher, getMessages, sendMessage} = new ApiService();
-
 
 const SingleChatPage  = () => {
     const {userId, objectId} = useParams();
@@ -31,7 +28,6 @@ const SingleChatPage  = () => {
 
         getMessages(userId, objectId)
             .then(data => {
-                console.log(data);
                 setMessages((prevMessages) => [...prevMessages, ...data]);
                 setStatus('idle');
             })
@@ -90,33 +86,12 @@ const SingleChatPage  = () => {
         // eslint-disable-next-line
     }, []);
 
-    useEffect(() => {
-        window.scrollTo({
-            top: document.body.scrollHeight,
-            behavior: "smooth"
-        });
-    }, [messages]);
-
-    const items = status === 'idle' && messages.map(message => {
-        return (
-            <Message key={message.id} isRightPos={message.from_user_id !== -1} text={message.text} time={moment(message.created_at).locale('ru').format("MMMM Do, HH:mm")} />
-        )
-    });
 
     const chatTitle = status === 'loading' ? 'Загрузка...' : 'Чат';
 
     return (
         <>
-            <Header title={chatTitle} />
-
-            <Box sx={{
-                padding: '60px 0 70px 0',
-            }}>
-                <Container maxWidth={false}>
-                    {items}
-                </Container>
-                <InputChat sendMessage={(message) => onSendMessage(message)} />
-            </Box>
+            {isIOS() ? <IphoneKeyboardFix chatTitle={chatTitle} messages={messages} onSendMessage={(message) => onSendMessage(message)} /> : <Chat messages={messages} onSendMessage={onSendMessage} chatTitle={chatTitle}/>}
 
             <BackButton onClick={() => {
                 navigate(-1);

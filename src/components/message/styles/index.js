@@ -9,7 +9,9 @@ export const MessageWrapper = styled("div")({
     display: "flex",
     alignItems: "flex-start",
     justifyContent: "flex-start",
-    marginTop: "20px",
+    paddingLeft: '12px',
+    paddingRight: '12px',
+    // marginTop: "40px",
 });
 
 export const ChatMessage = styled("div")({

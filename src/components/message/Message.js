@@ -1,4 +1,3 @@
-import { Typography } from "@mui/material";
 import { ChatMessage, MessageText, MessageTime, MessageWrapper } from "./styles";
 
 import shapeRight from '../../assets/icons/shape-right.svg';
@@ -8,10 +7,11 @@ import { colors } from "../../tools/colors";
 
 
 
-const Message = ({ isRightPos, text, time }) => {
+const Message = ({ isRightPos, text, time, style }) => {
     return (
         <MessageWrapper sx={{
             justifyContent: isRightPos ? 'flex-end' : 'flex-start',
+            ...style
         }}>
             <ChatMessage sx={{
                 borderRadius: isRightPos ? '8px 8px 0px 8px' : '8px 8px 8px 0px',

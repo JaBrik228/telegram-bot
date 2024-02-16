@@ -4,6 +4,8 @@ import SingleChatPage from "../../pages/singleChatPage/SingleChatPage";
 import { useExpand, useInitData } from "@vkruglikov/react-telegram-web-app";
 import { useEffect } from "react";
 
+
+
 function App() {
   const [initDataUnsafe] = useInitData();
 
@@ -16,7 +18,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Navigate to={/* `${initDataUnsafe.user.id}` */ '693764287'}/>}/>
+        <Route path="/" element={<Navigate to={`${initDataUnsafe.user.id}`}/>}/>
         <Route path="/:userId" element={<ChatsPage/>}/>
         <Route path="/chat/:userId/:objectId" element={<SingleChatPage/>}/>
       </Routes>

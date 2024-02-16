@@ -3,9 +3,11 @@ import { StyledHeader } from "./styles";
 
 import { colors } from "../../tools/colors";
 
-const Header = ({title}) => {
+const Header = ({title, isFixed}) => {
     return (
-        <StyledHeader>
+        <StyledHeader sx={{
+            position: isFixed ? 'fixed' : 'absolute'
+        }}>
             <Typography component={'h1'} sx={{
                 textAlign: 'center',
                 fontSize: '20px',
